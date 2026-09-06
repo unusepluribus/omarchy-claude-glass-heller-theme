@@ -1,0 +1,128 @@
+--- Bar.qml
++++ Bar.qml
+@@ -3,6 +3,7 @@
+ import Quickshell.Io
+ import Quickshell.Wayland
+ import QtQuick
++import QtQuick.Effects
+ import QtQuick.Layouts
+ import qs.Commons
+ import qs.Ui
+@@ -12,14 +13,15 @@
+   id: root
+ 
+   // The omarchy-shell host injects omarchyPath from OMARCHY_PATH.
+-  required property string omarchyPath
++  // Custom bars receive these values in Loader.onLoaded, after construction.
++  property string omarchyPath: Quickshell.env("OMARCHY_PATH") || "/usr/share/omarchy"
+   // Injected by the host shell so bar slots can resolve enabled widgets.
+-  required property var barWidgetRegistry
++  property var barWidgetRegistry: null
+   // Injected by the host shell every time shell.json is reloaded. Holds the
+   // `bar:` subtree: position, centerAnchor, layout. The host owns file IO;
+   // the bar just renders whatever it's handed. The bar font follows the
+   // OS-level fontconfig monospace binding — it is not stored in shell.json.
+-  required property var barConfig
++  property var barConfig: null
+   // Injected by the host shell. Used for shell-wide actions such as opening
+   // settings and persisting inline widget state.
+   property var shell: null
+@@ -71,6 +73,14 @@
+   property color background: Color.bar.background
+   property color urgent: Color.bar.active
+ 
++  // An explicit user choice persists across themes; otherwise use the theme.
++  readonly property bool floatingGlass: barConfig && typeof barConfig.floating === "boolean"
++    ? barConfig.floating
++    : Color.pick("bar.floating", "false") === "true"
++  readonly property int glassPadding: floatingGlass ? 10 : 0
++  readonly property int glassSideMargin: floatingGlass ? 12 : 0
++  readonly property int surfaceThickness: barSize + (floatingGlass ? 6 : 0) + glassPadding * 2
++
+   Behavior on barForeground { enabled: root.foregroundAnimationEnabled; ColorAnimation { duration: 420; easing.type: Easing.InOutCubic } }
+   Behavior on background { ColorAnimation { duration: 420; easing.type: Easing.InOutCubic } }
+   Behavior on urgent { ColorAnimation { duration: 420; easing.type: Easing.InOutCubic } }
+@@ -626,6 +636,22 @@
+     }
+   }
+ 
++  function setFloating(enabled) {
++    if (!root.shell || typeof root.shell.mutateShellConfig !== "function") return
++    root.shell.mutateShellConfig(function(config) {
++      if (!Util.isPlainObject(config.bar)) config.bar = {}
++      config.bar.floating = enabled === true
++    })
++  }
++
++  IpcHandler {
++    target: "claude-glass-bar"
++
++    function isFloating(): bool { return root.floatingGlass }
++    function toggleFloating(): void { root.setFloating(!root.floatingGlass) }
++    function setFloating(enabled: bool): void { root.setFloating(enabled) }
++  }
++
+   function rawLayoutSection(config, region) {
+     if (!Util.isPlainObject(config.bar)) config.bar = {}
+     if (!Util.isPlainObject(config.bar.layout)) config.bar.layout = {}
+@@ -1003,10 +1029,10 @@
+     }
+ 
+     margins {
+-      top: root.barHidden && root.position === "top" ? -root.barSize : 0
+-      bottom: root.barHidden && root.position === "bottom" ? -root.barSize : 0
+-      left: root.barHidden && root.position === "left" ? -root.barSize : 0
+-      right: root.barHidden && root.position === "right" ? -root.barSize : 0
++      top: root.barHidden && root.position === "top" ? -root.surfaceThickness : (root.vertical ? root.glassSideMargin : 0)
++      bottom: root.barHidden && root.position === "bottom" ? -root.surfaceThickness : (root.vertical ? root.glassSideMargin : 0)
++      left: root.barHidden && root.position === "left" ? -root.surfaceThickness : (!root.vertical ? root.glassSideMargin : 0)
++      right: root.barHidden && root.position === "right" ? -root.surfaceThickness : (!root.vertical ? root.glassSideMargin : 0)
+     }
+ 
+     anchors {
+@@ -1016,15 +1042,41 @@
+       right: root.position === "right" || !root.vertical
+     }
+ 
+-    implicitWidth: root.vertical ? root.barSize : 0
+-    implicitHeight: root.vertical ? 0 : root.barSize
+-    color: root.transparent ? "transparent" : root.background
++    implicitWidth: root.vertical ? root.surfaceThickness : 0
++    implicitHeight: root.vertical ? 0 : root.surfaceThickness
++    color: "transparent"
+     surfaceFormat.opaque: false
+     WlrLayershell.namespace: "omarchy-bar"
+     WlrLayershell.layer: WlrLayer.Top
+ 
+-    Loader {
++    // Transparent padding draws the shadow but passes clicks through.
++    mask: Region {
++      item: glassSurface
++      radius: glassSurface.radius
++    }
++
++    RectangularShadow {
++      anchors.fill: glassSurface
++      visible: root.floatingGlass && !root.transparent
++      radius: glassSurface.radius
++      blur: 8
++      offset.y: 2
++      color: "#60000000"
++    }
++
++    BorderSurface {
++      id: glassSurface
+       anchors.fill: parent
++      anchors.margins: root.glassPadding
++      radius: root.floatingGlass ? Math.min(width, height) / 2 : 0
++      color: root.transparent ? "transparent" : root.background
++      borderSpec: root.floatingGlass && !root.transparent
++        ? Border.surfaceSpec("bar", "border", Color.foreground, 1)
++        : Border.none()
++    }
++
++    Loader {
++      anchors.fill: glassSurface
+       sourceComponent: root.vertical ? verticalBar : horizontalBar
+ 
+       // A child of the loader, not a sibling of the sections: an ancestor stays

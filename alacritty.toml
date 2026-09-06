@@ -1,0 +1,51 @@
+[colors.primary]
+background = "#49453F"
+foreground = "#F2EEE5"
+
+[colors.cursor]
+text = "#49453F"
+cursor = "#FFF8EE"
+
+[colors.vi_mode_cursor]
+text = "#49453F"
+cursor = "#FFF8EE"
+
+[colors.search.matches]
+foreground = "#49453F"
+background = "#E0BD77"
+
+[colors.search.focused_match]
+foreground = "#49453F"
+background = "#DE9184"
+
+[colors.footer_bar]
+foreground = "#49453F"
+background = "#F2EEE5"
+
+[colors.selection]
+text = "#FFF8EE"
+background = "#686052"
+
+[colors.normal]
+black = "#49453F"
+red = "#DE9184"
+green = "#ADBB91"
+yellow = "#E0BD77"
+blue = "#A4B8CC"
+magenta = "#CFADC3"
+cyan = "#A6C0B6"
+white = "#F2EEE5"
+
+[colors.bright]
+black = "#ABA18F"
+red = "#F0AA9C"
+green = "#C2CFA5"
+yellow = "#F0CF93"
+blue = "#BCD0E0"
+magenta = "#E2C4D6"
+cyan = "#BBD8CC"
+white = "#FFF8EE"
+
+[window]
+# Frosted glass: let the wallpaper glow through.
+opacity = 0.72

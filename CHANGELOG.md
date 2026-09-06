@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.1 — 2026-09-06
+
+- Replace decorative glass ribbons with Omarchy Quiet: a small pixel wordmark on a matte Graphite/Taupe field.
+
+- Clarify which files Omarchy accepts from Git-installed themes and which styling needs reviewed local configuration.
+
 ## v0.1.0 — 2026-09-06
 
 - Initial public preview of Claude Glass Heller.

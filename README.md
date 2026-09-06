@@ -2,7 +2,7 @@
 
 A brighter smoky-taupe companion — deliberately midtone, never glaring white. Built from the Claude Dark palette for **Omarchy 4, Quickshell and Lua-based Hyprland**.
 
-![Claude Glass Heller wallpaper](backgrounds/1-claude-glass-heller.png)
+![Omarchy Quiet Taupe wallpaper](backgrounds/1-omarchy-quiet-taupe.png)
 
 ## Design
 
@@ -28,7 +28,11 @@ omarchy theme set claude-glass-heller
 
 ## Bar and optional extras
 
-Installing this theme applies colors, wallpaper, terminal transparency and Hyprland styling. It **does not replace your bar, rearrange widgets, install plugins or change your code font**.
+Installing from Git applies the palette, wallpaper and shell theme tokens. It **does not replace your bar, rearrange widgets, install plugins or change your code font**.
+
+**Omarchy's trust boundary:** on the tested version, Git-installed themes do not load bundled Lua or terminal configuration. Omarchy regenerates those files from the palette, so the advertised blur, corner geometry and terminal opacity require separate, reviewed local customization. The presence of these files in the repository is not a promise that the normal install command applies them.
+
+For the full styling, inspect `hyprland.lua` and the configuration for your terminal, then transfer only the desired settings into a backed-up local configuration or a separate user-owned theme. Do not blindly replace your terminal configuration or delete a clone's `.git` directory to bypass the filter. The optional hooks and plugins also require explicit installation.
 
 A theme alone cannot give the stock bar floating geometry. `extras/floating-bar.patch` documents the tested change to a **user-owned clone** of the Omarchy bar, including an optional floating toggle. It is a version-specific patch for review, not an automatic installer. Never patch `/usr/share/omarchy`; clone `omarchy.bar` first using `omarchy plugin clone omarchy.bar`, inspect the patch and use `patch --dry-run` on the clone before applying it. A failed context check means the installed bar version needs a fresh adaptation.
 
@@ -44,7 +48,7 @@ TOML and Lua syntax were checked. More monitors and different Omarchy versions n
 
 ## Wallpaper, license and related themes
 
-The wallpaper is AI-generated; its actual size and prompt are in [WALLPAPER.md](WALLPAPER.md). It is not a native 4K image. Theme code uses the MIT license; included original wallpaper files may be used and redistributed with the theme.
+The wallpaper is an AI-adapted Omarchy pixel wordmark on a restrained matte background, shared with the other Claude themes. Its native size and full prompts are in [WALLPAPER.md](WALLPAPER.md); it is not 4K. Theme code uses the MIT license. Omarchy attribution and its license notice are retained in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 [Claude Glass](https://github.com/unusepluribus/omarchy-claude-glass-theme) · [Glass Heller](https://github.com/unusepluribus/omarchy-claude-glass-heller-theme) · [Claude Atelier](https://github.com/unusepluribus/omarchy-claude-atelier-theme) · [Atelier Heller](https://github.com/unusepluribus/omarchy-claude-atelier-heller-theme)
 
